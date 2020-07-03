@@ -1,3 +1,5 @@
+use sp_std::vec::Vec;
+
 use crate::ecrecover::keccak;
 use crate::ecrecover::ecrecover;
 

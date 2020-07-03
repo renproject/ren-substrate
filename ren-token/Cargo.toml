@@ -4,7 +4,7 @@ description = 'Ren pallet'
 edition = '2018'
 homepage = 'https://renproject.io'
 license = 'Apache 2.0'
-name = 'rentoken-pallet'
+name = 'ren-token'
 repository = 'https://github.com/renproject/substrate-pallet/'
 version = '0.0.1'
 
