@@ -1,1 +1,1 @@
-`ren substrate pallets`
+# `ren substrate pallet`

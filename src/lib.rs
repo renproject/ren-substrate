@@ -1,4 +1,5 @@
 #![cfg_attr(not(feature = "std"), no_std)]
+#![cfg_attr(feature = "alloc", feature(alloc))]
 
 #[macro_use]
 extern crate alloc;
@@ -35,11 +36,11 @@ decl_event! {
 // This pallet's errors.
 decl_error! {
 	pub enum Error for Module<T: Trait> {
-		/// The mint signature is invalid
+		/// The mint signature is invalid.
 		InvalidMintSignature,
-		/// The mint signature has already been used
+		/// The mint signature has already been used.
 		SignatureAlreadyUsed,
-		/// The amount being burnt is greater than the account's balance
+		/// The amount being burnt is greater than the account's balance.
 		InsufficientBalance,
 	}
 }
@@ -66,7 +67,7 @@ decl_module! {
 		// A default function for depositing events
 		fn deposit_event() = default;
 
-		/// Allow a user to mint if they have a valid signature
+		/// Allow a user to mint if they have a valid signature from RenVM.
 		#[weight = 10_000]
 		fn mint(
 			origin,
@@ -75,17 +76,16 @@ decl_module! {
 			n_hash: Vec<u8>,
 			sig: Vec<u8>,
 		) {
-			// Determine who is calling the function
+			// Determine who is calling the function.
 			let sender = ensure_signed(origin)?;
 
-			// TODO: Convert sender to bytes directly.
-			// let sender_bytes: Vec<u8> = hex::decode(sender.to_string()).unwrap();
-			let sender_bytes = hex::decode("7ddfa2e5435027f6e13ca8db2f32ebd5551158bb").unwrap();
+			// FIXME: Access bytes of sender.
+			let sender_bytes: Vec<u8> = hex::decode("d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d").unwrap();
 
-			// Verify that the signature is valid
+			// Verify that the signature is valid.
 			ensure!(verify_signature::verify_signature(&p_hash, amount, &sender_bytes, &n_hash, &sig), Error::<T>::InvalidMintSignature);
 
-			// Verify that the signature hasn't been used previously
+			// Verify that the signature hasn't been used previously.
 			ensure!(!Signatures::contains_key(&sig), Error::<T>::SignatureAlreadyUsed);
 
 			// Store signature so it can't be used again.
@@ -102,17 +102,17 @@ decl_module! {
 			Self::deposit_event(RawEvent::AssetsMinted(sender, 0, amount));
 		}
 
-		/// Allow a user to burn assets
+		/// Allow a user to burn assets.
 		#[weight = 10_000]
 		fn burn(
 			origin,
 			to: Vec<u8>,
 			amount: u128,
 		) {
-			// Determine who is calling the function
+			// Determine who is calling the function.
 			let sender = ensure_signed(origin)?;
 
-			// Verify the user's balance
+			// Verify the user's balance.
 			ensure!(Balances::<T>::contains_key(&sender), Error::<T>::InsufficientBalance);
 			ensure!(Balances::<T>::get(&sender) >= amount, Error::<T>::InsufficientBalance);
 
@@ -132,19 +132,19 @@ decl_module! {
 			// Determine who is calling the function
 			let sender = ensure_signed(origin)?;
 
-			// Verify the user's balance
+			// Verify the sender's balance
 			ensure!(Balances::<T>::contains_key(&sender), Error::<T>::InsufficientBalance);
 			ensure!(Balances::<T>::get(&sender) >= amount, Error::<T>::InsufficientBalance);
 
-			// Decrement user's balance.
+			// Decrement sender's balance.
 			Balances::<T>::insert(&sender, Balances::<T>::get(&sender) - amount);
 
-			// If user doesn't have a balance, initiate it to 0.
+			// If recipient doesn't have a balance, initiate it to 0.
 			if !Balances::<T>::contains_key(&recipient) {
 				Balances::<T>::insert(&recipient, 0);
 			}
 
-			// Increment user's balance.
+			// Increment recipient's balance.
 			Balances::<T>::insert(&recipient, Balances::<T>::get(&recipient) + amount);
 
 			Self::deposit_event(RawEvent::AssetsTransferred(sender, recipient, 0, amount));

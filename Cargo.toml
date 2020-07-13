@@ -1,0 +1,41 @@
+[package]
+authors = ['Ren Project <https://github.com/renproject>']
+description = 'Ren pallet'
+edition = '2018'
+homepage = 'https://renproject.io'
+license = 'Apache 2.0'
+name = 'module-ren-token'
+repository = 'https://github.com/renproject/substrate-pallet/'
+version = '0.0.1'
+
+[dependencies]
+libsecp256k1 = { version = "^0.2.1", default-features = false }
+tiny-keccak = { version = "1.5", default-features = false, features = ["keccak"] }
+hex = { version = "0.4", default-features = false }
+serde = { version = "1.0.101", optional = true }
+codec = { package = "parity-scale-codec", version = "1.3.0", default-features = false }
+frame-support = { version = "2.0.0-rc4", default-features = false }
+frame-system = { version = "2.0.0-rc4", default-features = false }
+orml-traits = { path = "../../orml/traits", default-features = false }
+sp-runtime = { version = "2.0.0-rc4", default-features = false }
+sp-std = { version = "2.0.0-rc4", default-features = false }
+support = { package = "module-support", path = "../support", default-features = false }
+primitives = { package = "module-primitives", path = "../primitives", default-features = false }
+
+[dev-dependencies]
+sp-core = { version = "2.0.0-rc4", default-features = false }
+sp-io = { version = "2.0.0-rc4", default-features = false }
+
+[features]
+default = ["std"]
+std = [
+	"serde",
+	"codec/std",
+	"frame-support/std",
+	"frame-system/std",
+	"orml-traits/std",
+	"sp-runtime/std",
+	"sp-std/std",
+	"support/std",
+	"primitives/std",
+]

@@ -3,6 +3,10 @@ use sp_std::vec::Vec;
 use crate::ecrecover::keccak;
 use crate::ecrecover::ecrecover;
 
+const RENVM_SPLIT_PUBLIC_KEY: &str = "0000000000000000000000004b939fc8ade87cb50b78987b1dda927460dc456a";
+// TODO: Change to Currency identifier.
+const RENVM_BTC_IDENTIFIER: &str = "0a9add98c076448cbcfacf5e457da12ddbef4a8f";
+
 const P_HASH_OFFSET: usize = 0;
 const P_HASH_LENGTH: usize = 32;
 const AMOUNT_OFFSET: usize = P_HASH_OFFSET + P_HASH_LENGTH;
@@ -14,7 +18,7 @@ const TO_LENGTH: usize = 32;
 const N_HASH_OFFSET: usize = TO_OFFSET + TO_LENGTH;
 const N_HASH_LENGTH: usize = 32;
 
-/// ABI-encode the values for creating the signature hash.
+// ABI-encode the values for creating the signature hash.
 fn encode(
 	_p_hash: &Vec<u8>,
 	_amount: u128,
@@ -46,7 +50,7 @@ fn encode(
 	result
 }
 
-/// Verify that the signature has been signed by RenVM.
+// Verify that the signature has been signed by RenVM.
 pub fn verify_signature(
 	_p_hash: &Vec<u8>,
 	_amount: u128,
@@ -54,15 +58,19 @@ pub fn verify_signature(
 	_n_hash: &Vec<u8>,
 	_sig: &Vec<u8>,
 ) -> bool {
+	let ren_btc_identifier = hex::decode(RENVM_BTC_IDENTIFIER).unwrap();
+
 	let signed_message_hash = keccak(&encode(
 		_p_hash,
 		_amount, // _amount,
-		&hex::decode("0a9add98c076448cbcfacf5e457da12ddbef4a8f").unwrap(), // _token
+		&ren_btc_identifier, // _token
 		_to,
 		_n_hash
 	)[..]);
 	let recovered_address = ecrecover(signed_message_hash, _sig).unwrap();
-	// TODO: Don't hard-code MPKH.
-	let expected_address = hex::decode("00000000000000000000000044bb4ef43408072bc888afd1a5986ba0ce35cb54").unwrap();
+
+	// Expected address is RenVM's split public key.
+	let expected_address = hex::decode(RENVM_SPLIT_PUBLIC_KEY).unwrap();
+
 	return recovered_address.eq(&expected_address);
 }
