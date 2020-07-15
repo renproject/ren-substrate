@@ -60,13 +60,15 @@ pub fn verify_signature(
 ) -> bool {
 	let ren_btc_identifier = hex::decode(RENVM_BTC_IDENTIFIER).unwrap();
 
-	let signed_message_hash = keccak(&encode(
+	let encoded = encode(
 		_p_hash,
 		_amount, // _amount,
 		&ren_btc_identifier, // _token
 		_to,
 		_n_hash
-	)[..]);
+	);
+
+	let signed_message_hash = keccak(&encoded[..]);
 	let recovered_address = ecrecover(signed_message_hash, _sig).unwrap();
 
 	// Expected address is RenVM's split public key.

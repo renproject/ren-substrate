@@ -1,26 +1,25 @@
-// Tests to be written here
+//! Unit tests for the airdrop module.
 
-use crate::{Error, mock::*};
-use frame_support::{assert_ok, assert_noop};
+#![cfg(test)]
 
-#[test]
-fn it_works_for_default_value() {
-	new_test_ext().execute_with(|| {
-		// Just a dummy test for the dummy function `do_something`
-		// calling the `do_something` function with a value 42
-		assert_ok!(TemplateModule::do_something(Origin::signed(1), 42));
-		// asserting that the stored value is equal to what we stored
-		assert_eq!(TemplateModule::something(), Some(42));
-	});
-}
+use super::*;
+use frame_support::{assert_noop, assert_ok};
+use mock::{RenToken, ExtBuilder, Origin, System, TestEvent, ALICE, BOB, CHARLIE};
+use sp_runtime::traits::BadOrigin;
+
+use crate::verify_signature::verify_signature;
 
 #[test]
-fn correct_error_for_none_value() {
-	new_test_ext().execute_with(|| {
-		// Ensure the correct error is thrown on None value
-		assert_noop!(
-			TemplateModule::cause_error(Origin::signed(1)),
-			Error::<Test>::NoneValue
+fn can_verify_signature() {
+	ExtBuilder::default().build().execute_with(|| {
+		assert_ok!(
+			RenToken::mint(
+				Origin::signed(ALICE),
+				hex::decode("c5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470").unwrap(), // phash
+				5000, // amount
+				hex::decode("e96cc92771222bd8f674ddf4ef6a4264e38030e90380fb215cb145591ed803e9").unwrap(), // nhash
+				hex::decode("1beaeea7cb5433659979ba0ba17bc0174c87b6208ea0fa82e1478a74b3ded5a27324239b8f0ef31f54cc56deb32bb8962803ecf399eac7ade08f291ae03f6a1f1c").unwrap() // signature
+			)
 		);
 	});
 }

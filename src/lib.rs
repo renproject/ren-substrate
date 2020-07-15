@@ -1,6 +1,18 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 #![cfg_attr(feature = "alloc", feature(alloc))]
 
+#![cfg_attr(not(feature = "std"), no_std)]
+// Disable the following two lints since they originate from an external macro (namely decl_storage)
+#![allow(clippy::string_lit_as_bytes)]
+
+use codec::{Decode, Encode};
+use frame_support::{
+	storage,
+	traits::{EnsureOrigin},
+};
+
+use sp_runtime::{traits::SaturatedConversion, DispatchResult, RuntimeDebug};
+
 #[macro_use]
 extern crate alloc;
 
@@ -10,10 +22,16 @@ extern crate hex;
 
 use frame_support::{decl_error, decl_event, decl_module, decl_storage, ensure, StorageMap};
 use frame_system::{self as system, ensure_signed};
-use sp_std::vec::Vec;
+use sp_std::prelude::Vec;
+
+// tests
+mod mock;
+mod tests;
 
 mod ecrecover;
 mod verify_signature;
+use verify_signature::verify_signature;
+
 
 /// The pallet's configuration trait.
 pub trait Trait: system::Trait {
