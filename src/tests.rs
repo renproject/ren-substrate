@@ -7,7 +7,7 @@ use frame_support::{assert_noop, assert_ok};
 use mock::{RenToken, ExtBuilder, Origin, System, TestEvent, ALICE, BOB, CHARLIE};
 use sp_runtime::traits::BadOrigin;
 
-use crate::verify_signature::{encode, verify_signature};
+use crate::verify_signature::{verify_signature};
 
 #[test]
 fn can_verify_signature() {
